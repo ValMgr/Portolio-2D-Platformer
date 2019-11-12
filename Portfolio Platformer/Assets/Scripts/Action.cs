@@ -7,9 +7,6 @@ public class Action : MonoBehaviour {
     [System.NonSerialized]
     public bool canAct = false;
 
-
-
-
     
     public GameObject PKIcon;
     private Vector3 SpawnPos;

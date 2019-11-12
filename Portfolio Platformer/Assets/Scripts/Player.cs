@@ -13,7 +13,6 @@ public class Player : MonoBehaviour {
 
     private bool isJumping = false;
     private bool isDoubleJumping = false;
-    private bool isMirror = false;
 
     private GameObject mant;
     private GameObject body;
@@ -21,6 +20,8 @@ public class Player : MonoBehaviour {
     private GameObject leg1;
 
     private bool canMove = true;
+    public GameObject menu;
+    private bool menuDisplayed = false;
 
     private void Start() {
 
@@ -29,11 +30,9 @@ public class Player : MonoBehaviour {
         leg0 = GameObject.Find("Leg (0)");
         leg1 = GameObject.Find("Leg (1)");
 
-
     }
 
-    private void FixedUpdate() {
-        
+    private void Update() {
         var Signs = GameObject.FindGameObjectsWithTag("Signs");
         foreach (var Sign in Signs){
             canMove = !Sign.GetComponent<Sign>().isShow;
@@ -41,37 +40,47 @@ public class Player : MonoBehaviour {
                     break;
                 }
         }
+    }
 
-        if(canMove){
-            float moove = Input.GetAxis("Horizontal");
-            rb2d.velocity = new Vector2(speed * moove, rb2d.velocity.y);
-            animator.SetFloat("Speed", Mathf.Abs(moove));
-        }
+    private void FixedUpdate() {
+
         
-
-        if(Input.GetAxis("Horizontal") < 0f){
-            isMirror = true;
-        }
-        if(Input.GetAxis("Horizontal") > 0f){
-            isMirror = false;
+       
+        if(Input.GetKeyDown("escape")){
+            getMenu();
         }
 
+        Moove();
         Jump();
         DoubleJump();
-        Mirror(isMirror);
-
         JumpDelay = JumpDelay - Time.deltaTime;
     }
 
     float JumpDelay = 0f;
     void Jump(){
 
-        if(Input.GetAxis("Vertical") > 0 && !isJumping && canMove){
+        if(Input.GetAxis("Vertical") > 0 && !isJumping && canMove && !menuDisplayed){
             rb2d.AddForce(new Vector2 (rb2d.velocity.x, jumpForce * 120f));
             isJumping = true;
             JumpDelay = 0.5f;
         }
        
+    }
+
+    void Moove(){
+
+        if(canMove && !menuDisplayed){
+            float moove = Input.GetAxis("Horizontal");
+            rb2d.velocity = new Vector2(speed * moove, rb2d.velocity.y);
+            animator.SetFloat("Speed", Mathf.Abs(moove));
+        }
+        
+        if(Input.GetAxis("Horizontal") < 0f){
+            this.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        if(Input.GetAxis("Horizontal") > 0f){
+            this.transform.localScale = new Vector3(1, 1, 1);
+        }
     }
 
     void DoubleJump(){
@@ -81,23 +90,6 @@ public class Player : MonoBehaviour {
         }
     }
 
-    void Mirror(bool isMirror){
-        if(isMirror){
-            body.GetComponent<SpriteRenderer>().flipX = true;
-            mant.GetComponent<SpriteRenderer>().flipX = true;
-            mant.transform.position = new Vector3(this.transform.position.x + 0.3f, this.transform.position.y - 0.3f, this.transform.position.z);
-            leg0.transform.position = new Vector3(this.transform.position.x -0.3f, this.transform.position.y - 0.95f, this.transform.position.z);
-            leg1.transform.position = new Vector3(this.transform.position.x + 0.1f, this.transform.position.y - 0.95f, this.transform.position.z);
-
-        }
-        else if(!isMirror){
-            body.GetComponent<SpriteRenderer>().flipX = false;
-            mant.GetComponent<SpriteRenderer>().flipX = false;
-            mant.transform.position = new Vector3(this.transform.position.x - 0.3f, this.transform.position.y - 0.3f, this.transform.position.z);
-            leg0.transform.position = new Vector3(this.transform.position.x - 0.1f, this.transform.position.y - 0.95f, this.transform.position.z);
-            leg1.transform.position = new Vector3(this.transform.position.x + 0.3f, this.transform.position.y - 0.95f, this.transform.position.z);
-        }
-    }
 
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Ground")){
@@ -110,6 +102,23 @@ public class Player : MonoBehaviour {
             this.transform.position = new Vector3(this.transform.position.x, 15f, this.transform.position.z);
         }
 
+    }
+
+    private void getMenu(){
+
+        if(!menu.activeSelf){
+            menu.SetActive(true);
+            menuDisplayed = true;
+        }
+        else{
+            menu.SetActive(false);
+            menuDisplayed = false;
+        }
+    }
+
+    public void Exit(){
+        Application.OpenURL("./home.html");
+        //Application.OpenURL("http://valentin-magry.fr/home.html");
     }
 
     
