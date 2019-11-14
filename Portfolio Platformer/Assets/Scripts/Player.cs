@@ -14,38 +14,23 @@ public class Player : MonoBehaviour {
     private bool isJumping = false;
     private bool isDoubleJumping = false;
 
-    private GameObject mant;
-    private GameObject body;
-    private GameObject leg0;
-    private GameObject leg1;
-
-    private bool canMove = true;
-    public GameObject menu;
+    [System.NonSerialized]
+    public bool canMove = true;
+    private GameObject menu;
     private bool menuDisplayed = false;
 
-    private void Start() {
+    private GameObject PKIcon;
 
-        mant = GameObject.Find("Mant");
-        body = GameObject.Find("Body");
-        leg0 = GameObject.Find("Leg (0)");
-        leg1 = GameObject.Find("Leg (1)");
+    private void Awake() {
+        DontDestroyOnLoad(this.gameObject);
 
-    }
-
-    private void Update() {
-        var Signs = GameObject.FindGameObjectsWithTag("Signs");
-        foreach (var Sign in Signs){
-            canMove = !Sign.GetComponent<Sign>().isShow;
-                if(!canMove){
-                    break;
-                }
-        }
+        menu = GameObject.Find("Menu");
+        menu.SetActive(false);
+        PKIcon = Resources.Load<GameObject>("Prefabs/PressKeyAction");
     }
 
     private void FixedUpdate() {
 
-        
-       
         if(Input.GetKeyDown("escape")){
             getMenu();
         }
@@ -53,6 +38,7 @@ public class Player : MonoBehaviour {
         Moove();
         Jump();
         DoubleJump();
+        Action();
         JumpDelay = JumpDelay - Time.deltaTime;
     }
 
@@ -102,6 +88,37 @@ public class Player : MonoBehaviour {
             this.transform.position = new Vector3(this.transform.position.x, 15f, this.transform.position.z);
         }
 
+    }
+
+    private GameObject area;
+    private void OnTriggerEnter2D(Collider2D other) {
+
+        if(GameObject.Find("PressKeyAction") == null){
+            Vector3 SpawnPos = new Vector3(other.transform.position.x, other.transform.position.y + 2f, other.transform.position.z);
+            GameObject PressKeyIcon = Instantiate(PKIcon, SpawnPos, Quaternion.identity) as GameObject;
+            PressKeyIcon.name = "PressKeyAction";
+            PressKeyIcon.transform.parent = GameObject.Find("GUI").transform;
+        }
+        
+
+        area = other.gameObject;
+    }
+
+    private void OnTriggerExit2D(Collider2D other) {
+        GameObject PressKeyIcon = GameObject.Find("PressKeyAction");
+        Destroy(PressKeyIcon);
+    }
+
+    private void Action(){
+
+        if(Input.GetKeyDown("e")){
+            if(area.CompareTag("Signs")){
+                area.GetComponent<Sign>().Display();
+            }
+            if(area.CompareTag("Door")){
+                area.GetComponent<Door>().OpenDoor();
+            }
+        }
     }
 
     private void getMenu(){
