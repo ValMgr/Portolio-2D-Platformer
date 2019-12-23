@@ -4,6 +4,11 @@ public class PlayerCamera : MonoBehaviour {
     
     public GameObject target;
     private float yPos = 0f;
+
+    private void Start() {
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     private void Update() {
 
         yPos = target.transform.position.y;

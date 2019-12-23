@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+
 
 public class Player : MonoBehaviour {
     
@@ -29,6 +31,14 @@ public class Player : MonoBehaviour {
         PKIcon = Resources.Load<GameObject>("Prefabs/PressKeyAction");
     }
 
+    void OnLevelWasLoaded(){
+        this.transform.position = new Vector3(0, 0, 0);
+    }
+
+    private void Update() {
+        Action();
+    }
+
     private void FixedUpdate() {
 
         if(Input.GetKeyDown("escape")){
@@ -38,19 +48,7 @@ public class Player : MonoBehaviour {
         Moove();
         Jump();
         DoubleJump();
-        Action();
         JumpDelay = JumpDelay - Time.deltaTime;
-    }
-
-    float JumpDelay = 0f;
-    void Jump(){
-
-        if(Input.GetAxis("Vertical") > 0 && !isJumping && canMove && !menuDisplayed){
-            rb2d.AddForce(new Vector2 (rb2d.velocity.x, jumpForce * 120f));
-            isJumping = true;
-            JumpDelay = 0.5f;
-        }
-       
     }
 
     void Moove(){
@@ -67,6 +65,17 @@ public class Player : MonoBehaviour {
         if(Input.GetAxis("Horizontal") > 0f){
             this.transform.localScale = new Vector3(1, 1, 1);
         }
+    }
+
+    float JumpDelay = 0f;
+    void Jump(){
+
+        if(Input.GetAxis("Vertical") > 0 && !isJumping && canMove && !menuDisplayed){
+            rb2d.AddForce(new Vector2 (rb2d.velocity.x, jumpForce * 120f));
+            isJumping = true;
+            JumpDelay = 0.5f;
+        }
+       
     }
 
     void DoubleJump(){
@@ -88,6 +97,10 @@ public class Player : MonoBehaviour {
             this.transform.position = new Vector3(this.transform.position.x, 15f, this.transform.position.z);
         }
 
+        if(other.gameObject.CompareTag("Start")){
+
+        }
+
     }
 
     private GameObject area;
@@ -107,22 +120,24 @@ public class Player : MonoBehaviour {
     private void OnTriggerExit2D(Collider2D other) {
         GameObject PressKeyIcon = GameObject.Find("PressKeyAction");
         Destroy(PressKeyIcon);
+        area = null;
     }
 
     private void Action(){
 
         if(Input.GetKeyDown("e")){
-            if(area.CompareTag("Signs")){
-                area.GetComponent<Sign>().Display();
-            }
-            if(area.CompareTag("Door")){
-                area.GetComponent<Door>().OpenDoor();
+            if(area != null){
+                if(area.CompareTag("Signs")){
+                    area.GetComponent<Sign>().Display();
+                }
+                if(area.CompareTag("Door")){
+                    area.GetComponent<Door>().OpenDoor();
+                }
             }
         }
     }
 
     private void getMenu(){
-
         if(!menu.activeSelf){
             menu.SetActive(true);
             menuDisplayed = true;

@@ -14,6 +14,8 @@ public class DayNNite : MonoBehaviour
 
     void Start(){
 
+        DontDestroyOnLoad(this.gameObject);
+
         Cam = GameObject.Find("Main Camera");
 
         CurrentHour = System.DateTime.Now.Hour;
