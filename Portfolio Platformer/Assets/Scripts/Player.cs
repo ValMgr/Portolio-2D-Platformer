@@ -98,7 +98,7 @@ public class Player : MonoBehaviour {
         }
 
         if(other.gameObject.CompareTag("Start")){
-
+            SceneManager.LoadScene("Main");
         }
 
     }
