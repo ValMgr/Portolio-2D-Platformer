@@ -13,9 +13,6 @@ public class DayNNite : MonoBehaviour
     Color SkyColor;
 
     void Start(){
-
-        DontDestroyOnLoad(this.gameObject);
-
         Cam = GameObject.Find("Main Camera");
 
         CurrentHour = System.DateTime.Now.Hour;
@@ -36,11 +33,14 @@ public class DayNNite : MonoBehaviour
        }
 
         Cam.GetComponent<Camera>().backgroundColor = SkyColor;
-
     }
 
-    private void FixedUpdate() {
-        CamPos = Cam.GetComponent<Transform>().position;
-        transform.position = new Vector3(CamPos.x, -20f, 5f);
+    public void test(){
+        Debug.Log("test");
     }
+
+    // private void FixedUpdate() {
+    //     CamPos = Cam.GetComponent<Transform>().position;
+    //     transform.position = new Vector3(CamPos.x, -20f, 5f);
+    // }
 }

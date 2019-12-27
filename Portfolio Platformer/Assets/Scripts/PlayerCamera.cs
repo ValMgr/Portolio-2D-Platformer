@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerCamera : MonoBehaviour {
     
     public GameObject target;
-    private float yPos = 0f;
+    private float yPos;
 
     private void Start() {
         DontDestroyOnLoad(this.gameObject);

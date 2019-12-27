@@ -31,24 +31,32 @@ public class Player : MonoBehaviour {
         PKIcon = Resources.Load<GameObject>("Prefabs/PressKeyAction");
     }
 
+    private Vector3 doorPosition;
+
+    public void SetDoorPosition(Vector3 newPos){
+        doorPosition = newPos;
+    }
     void OnLevelWasLoaded(){
-        this.transform.position = new Vector3(0, 0, 0);
+        this.transform.position = doorPosition;
     }
 
     private void Update() {
-        Action();
-    }
-
-    private void FixedUpdate() {
 
         if(Input.GetKeyDown("escape")){
             getMenu();
         }
 
+        Action();
+    }
+
+    private void FixedUpdate() {
         Moove();
         Jump();
         DoubleJump();
-        JumpDelay = JumpDelay - Time.deltaTime;
+
+        if(JumpDelay > 0){
+            JumpDelay = JumpDelay - Time.deltaTime;
+        }
     }
 
     void Moove(){
@@ -84,7 +92,7 @@ public class Player : MonoBehaviour {
             isDoubleJumping = true;
         }
     }
-
+    
 
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Ground")){
@@ -99,6 +107,8 @@ public class Player : MonoBehaviour {
 
         if(other.gameObject.CompareTag("Start")){
             SceneManager.LoadScene("Main");
+            GameObject.Find("Main Camera").gameObject.transform.GetChild(1).gameObject.SetActive(true);
+            doorPosition = new Vector3(0, 0, 0);
         }
 
     }
@@ -106,11 +116,11 @@ public class Player : MonoBehaviour {
     private GameObject area;
     private void OnTriggerEnter2D(Collider2D other) {
 
-        if(GameObject.Find("PressKeyAction") == null){
+        if(GameObject.Find("PressKeyDisplay") == null){
             Vector3 SpawnPos = new Vector3(other.transform.position.x, other.transform.position.y + 2f, other.transform.position.z);
             GameObject PressKeyIcon = Instantiate(PKIcon, SpawnPos, Quaternion.identity) as GameObject;
-            PressKeyIcon.name = "PressKeyAction";
-            PressKeyIcon.transform.parent = GameObject.Find("GUI").transform;
+            PressKeyIcon.name = "PressKeyDisplay";
+            //PressKeyIcon.transform.parent = GameObject.Find("GUI").transform;
         }
         
 
@@ -118,7 +128,7 @@ public class Player : MonoBehaviour {
     }
 
     private void OnTriggerExit2D(Collider2D other) {
-        GameObject PressKeyIcon = GameObject.Find("PressKeyAction");
+        GameObject PressKeyIcon = GameObject.Find("PressKeyDisplay");
         Destroy(PressKeyIcon);
         area = null;
     }
@@ -132,6 +142,9 @@ public class Player : MonoBehaviour {
                 }
                 if(area.CompareTag("Door")){
                     area.GetComponent<Door>().OpenDoor();
+                }
+                if(area.CompareTag("NPC")){
+                    area.GetComponent<NPC>().GetDialog();
                 }
             }
         }
